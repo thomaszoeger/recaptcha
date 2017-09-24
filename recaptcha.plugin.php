@@ -2,6 +2,8 @@
 /**
 * Adds a reCAPTCHA to comment forms for visitors that are not logged in
 * and do not have previously approved comments.
+*
+* This version should be able to handle http and https pages with recaptcha
 **/
 class Recaptcha extends Plugin {
 	private $ready = false;
@@ -14,7 +16,7 @@ class Recaptcha extends Plugin {
 	 */
 	public function configure() {
 		$ui = new FormUI( 'recaptcha_configuration' );
-		$ui->append( 'static', 'recaptcha_info', '<p>In order to use reCAPTCHA you need to supply a key pair. You can <a href="http://code.google.com/apis/recaptcha/" target="_blank">get one for free</a>. Please enter your public and private keys below:</p>' );
+		$ui->append( 'static', 'recaptcha_info', '<p>In order to use reCAPTCHA you need to supply a key pair. You can <a href="//code.google.com/apis/recaptcha/" target="_blank">get one for free</a>. Please enter your public and private keys below:</p>' );
 		
 		$public = $ui->append( 'text', 'public_key', 'recaptcha__public_key', 'Public key:' );
 		$public->add_validator( 'Recaptcha::check_keys' );
@@ -24,7 +26,7 @@ class Recaptcha extends Plugin {
 		$private->add_validator( 'Recaptcha::check_keys' );
 		$private->size = $private->maxlength = 40;
 		
-		$theme = $ui->append( 'select', 'recaptcha_theme', 'recaptcha__theme', 'reCAPTCHA theme <small>(<a href="http://code.google.com/apis/recaptcha/docs/customization.html" target="_blank">view samples</a>)</small>:', array( 'red' => 'Red (default)', 'white' => 'White', 'blackglass' => 'Blackglass', 'clean' => 'Clean', 'custom' => 'Custom (requries theme support)' ) );
+		$theme = $ui->append( 'select', 'recaptcha_theme', 'recaptcha__theme', 'reCAPTCHA theme <small>(<a href="//code.google.com/apis/recaptcha/docs/customization.html" target="_blank">view samples</a>)</small>:', array( 'red' => 'Red (default)', 'white' => 'White', 'blackglass' => 'Blackglass', 'clean' => 'Clean', 'custom' => 'Custom (requries theme support)' ) );
 		
 		$ui->append( 'submit', 'save', 'Save' );
 		
@@ -73,8 +75,8 @@ class Recaptcha extends Plugin {
 			} else if( $this->options['theme'] != 'red' ) {
 				$html .= '<script type="text/javascript">var RecaptchaOptions={theme:"' . $this->options['theme'] . '"};</script>';
 			}
-			$html .= '<script src="http://www.google.com/recaptcha/api/challenge?k=' . $this->options['public_key'] .'"></script>';
-			$html .= '<noscript><iframe id="recaptcha-no-js" src="http://www.google.com/recaptcha/api/noscript?k=' . $this->options['public_key'] .'" height="300" width="700" frameborder="0"></iframe><br><textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea><input type="hidden" name="recaptcha_response_field" value="manual_challenge"></noscript>';
+			$html .= '<script src="//www.google.com/recaptcha/api/challenge?k=' . $this->options['public_key'] .'"></script>';
+			$html .= '<noscript><iframe id="recaptcha-no-js" src="//www.google.com/recaptcha/api/noscript?k=' . $this->options['public_key'] .'" height="300" width="700" frameborder="0"></iframe><br><textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea><input type="hidden" name="recaptcha_response_field" value="manual_challenge"></noscript>';
 			
 			$recaptcha = $form->insert( 'cf_submit', 'static', 'recaptcha', $html );
 			$recaptcha->add_validator( array( $this, 'validate' ) );
